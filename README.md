@@ -1,0 +1,1 @@
+Minimal reimplmentation of Sutskever, Ilya, Oriol Vinyals, and Quoc V. Le. “Sequence to Sequence Learning with Neural Networks.” arXiv:1409.3215. Preprint, arXiv, December 14, 2014. https://doi.org/10.48550/arXiv.1409.3215.
