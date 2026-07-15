@@ -10,7 +10,7 @@ class Seq2Seq(nn.Module):
         self,
         encoder: Encoder,
         decoder: Decoder,
-        target_vocab_size,
+        target_vocab_size: int,
     ):
         super().__init__()
         self.encoder = encoder
@@ -21,6 +21,7 @@ class Seq2Seq(nn.Module):
         self,
         src: torch.Tensor,
         tgt: torch.Tensor,
+        full_teacher_forcing: bool
     ):
         
         batch_size = src.shape[0]
@@ -47,9 +48,11 @@ class Seq2Seq(nn.Module):
             )
             
             all_logits[:, t - 1, :] = logits
-
-            # Then start full teacher forcing: give the decoder the correct previous token
-            input_token = tgt[:, t]
+            
+            if full_teacher_forcing:
+                input_token = tgt[:, t]
+            else:
+                input_token = logits.argmax(dim=-1)
 
         # Return all logits for each time position, for each sequence in the batch
         return all_logits

@@ -53,6 +53,6 @@ def test_seq2seq():
         target_vocab_size=TGT_VOCAB_SIZE,
     )
 
-    all_logits = model(src, tgt)
+    all_logits = model(src, tgt, False)
 
     assert all_logits.shape == (BATCH_SIZE, TGT_LENGTH - 1, TGT_VOCAB_SIZE)
