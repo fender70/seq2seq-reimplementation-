@@ -20,8 +20,7 @@ class Seq2Seq(nn.Module):
     def forward(
         self,
         src: torch.Tensor,
-        tgt: torch.Tensor,
-        full_teacher_forcing: bool
+        tgt: torch.Tensor,    
     ):
         
         batch_size = src.shape[0]
@@ -49,10 +48,41 @@ class Seq2Seq(nn.Module):
             
             all_logits[:, t - 1, :] = logits
             
-            if full_teacher_forcing:
-                input_token = tgt[:, t]
-            else:
-                input_token = logits.argmax(dim=-1)
+            input_token = tgt[:, t]
 
         # Return all logits for each time position, for each sequence in the batch
         return all_logits
+        
+    # TODO(Cedric): Implement early stopping if generate EOS token
+    def generate(
+        self,
+        src: torch.Tensor,
+        sos_idx: int,
+        max_length: int,
+    ) -> torch.Tensor:
+        
+        batch_size = src.shape[0]
+
+        input_token = torch.full(
+            (batch_size,),
+            sos_idx,
+            dtype=torch.long,
+            device=src.device
+        )
+
+        _, hidden, cell = self.encoder(src)
+
+        generated_steps = []
+
+        for _ in range(max_length):
+            logits, hidden, cell = self.decoder(
+                input_token,
+                hidden,
+                cell,
+            )
+
+            input_token = logits.argmax(dim=-1)
+            generated_steps.append(input_token)
+
+        return torch.stack(generated_steps, dim=1)
+
